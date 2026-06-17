@@ -2,20 +2,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const voteButtons = document.querySelectorAll('.vote-btn');
     const count1 = document.getElementById('count1');
     const count2 = document.getElementById('count2');
+    const titleEl = document.querySelector('h1');
+    const char1El = document.querySelector('#card1 h2');
+    const char2El = document.querySelector('#card2 h2');
     const BACKEND_URL = 'https://yugioh-vote-backend.onrender.com'; // <-- change after deploying backend
+
+    async function loadConfig() {
+        try {
+            const resp = await fetch(`${BACKEND_URL}/config`);
+            if (!resp.ok) throw new Error('Backend config error');
+            const data = await resp.json();
+            return data;
+        } catch (e) {
+            // fallback to default values
+            return {
+                title: 'Quel personnage préférez-vous ?',
+                char1: 'Personnage 1',
+                char2: 'Personnage 2'
+            };
+        }
+    }
 
     async function loadCounts() {
         try {
             const resp = await fetch(`${BACKEND_URL}/counts`);
-            if (!resp.ok) throw new Error('Backend error');
+            if (!resp.ok) throw new Error('Backend counts error');
             const data = await resp.json();
-            count1.textContent = data['1'] || 0;
-            count2.textContent = data['2'] || 0;
+            return data;
         } catch (e) {
             // fallback to localStorage
             const votes = JSON.parse(localStorage.getItem('yugiohVotes')) || {1:0,2:0};
-            count1.textContent = votes[1];
-            count2.textContent = votes[2];
+            return votes;
         }
     }
 
@@ -28,6 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             if (!resp.ok) throw new Error('Vote failed');
             const data = await resp.json();
+            // update counts from backend
             count1.textContent = data['1'] || 0;
             count2.textContent = data['2'] || 0;
             // also update localStorage for fallback
@@ -45,7 +63,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    loadCounts();
+    async function init() {
+        const config = await loadConfig();
+        if (titleEl) titleEl.textContent = config.title;
+        if (char1El) char1El.textContent = config.char1;
+        if (char2El) char2El.textContent = config.char2;
+        const counts = await loadCounts();
+        count1.textContent = counts['1'] || 0;
+        count2.textContent = counts['2'] || 0;
+    }
+
+    init();
 
     voteButtons.forEach(btn => {
         btn.addEventListener('click', () => {
