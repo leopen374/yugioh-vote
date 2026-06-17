@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const char2El = document.querySelector('#card2 h2');
     const img1El = document.querySelector('#card1 img');
     const img2El = document.querySelector('#card2 img');
+    const resultDiv = document.getElementById('result');
     const BACKEND_URL = 'https://yugioh-vote-backend.onrender.com'; // <-- change after deploying backend
 
     async function loadConfig() {
@@ -22,7 +23,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 char1: 'Personnage 1',
                 char2: 'Personnage 2',
                 image1: 'https://via.placeholder.com/150x200?text=Perso+1',
-                image2: 'https://via.placeholder.com/150x200?text=Perso+2'
+                image2: 'https://via.placeholder.com/150x200?text=Perso+2',
+                voting_closed: false,
+                winner: null
             };
         }
     }
@@ -63,6 +66,15 @@ document.addEventListener('DOMContentLoaded', () => {
             if (char2El) char2El.textContent = config.char2;
             // if (img1El) img1El.src = config.image1;
             // if (img2El) img2El.src = config.image2;
+            // Handle closed vote
+            if (config.voting_closed) {
+                // Hide vote buttons
+                voteButtons.forEach(btn => btn.style.display = 'none');
+                // Show result
+                const winnerName = config.winner === 1 ? config.char1 : config.winner === 2 ? config.char2 : 'Inconnu';
+                resultDiv.textContent = `Le vainqueur est : ${winnerName}`;
+                resultDiv.style.display = 'block';
+            }
         } catch (e) {
             alert('Erreur de chargement de la configuration: ' + e.message);
         }
