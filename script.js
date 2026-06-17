@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await resp.json();
             return data;
         } catch (e) {
-            // fallback to default values
+            // fallback to default values (no localStorage)
             return {
                 title: 'Quel personnage préférez-vous ?',
                 char1: 'Personnage 1',
@@ -28,16 +28,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function loadCounts() {
-        try {
-            const resp = await fetch(`${BACKEND_URL}/counts`);
-            if (!resp.ok) throw new Error('Backend counts error');
-            const data = await resp.json();
-            return data;
-        } catch (e) {
-            // fallback to localStorage
-            const votes = JSON.parse(localStorage.getItem('yugiohVotes')) || {1:0,2:0};
-            return votes;
-        }
+        const resp = await fetch(`${BACKEND_URL}/counts`);
+        if (!resp.ok) throw new Error('Backend counts error');
+        return await resp.json();
     }
 
     async function vote(id) {
@@ -56,32 +49,32 @@ document.addEventListener('DOMContentLoaded', () => {
             // success
             count1.textContent = data['1'] || 0;
             count2.textContent = data['2'] || 0;
-            // also update localStorage for fallback
-            const votes = JSON.parse(localStorage.getItem('yugiohVotes')) || {1:0,2:0};
-            votes[id] = (votes[id] || 0) + 1;
-            localStorage.setItem('yugiohVotes', JSON.stringify(votes));
         } catch (e) {
             // network or unexpected error
-            // fallback to localStorage only
-            const votes = JSON.parse(localStorage.getItem('yugiohVotes')) || {1:0,2:0};
-            votes[id] = (votes[id] || 0) + 1;
-            localStorage.setItem('yugiohVotes', JSON.stringify(votes));
-            count1.textContent = votes[1];
-            count2.textContent = votes[2];
-            alert('Backend indisponible, vote enregistré localement');
+            alert('Backend indisponible: ' + e.message);
         }
     }
 
     async function init() {
-        const config = await loadConfig();
-        if (titleEl) titleEl.textContent = config.title;
-        if (char1El) char1El.textContent = config.char1;
-        if (char2El) char2El.textContent = config.char2;
-        if (img1El) img1El.src = config.image1;
-        if (img2El) img2El.src = config.image2;
-        const counts = await loadCounts();
-        count1.textContent = counts['1'] || 0;
-        count2.textContent = counts['2'] || 0;
+        try {
+            const config = await loadConfig();
+            if (titleEl) titleEl.textContent = config.title;
+            if (char1El) char1El.textContent = config.char1;
+            if (char2El) char2El.textContent = config.char2;
+            if (img1El) img1El.src = config.image1;
+            if (img2El) img2El.src = config.image2;
+        } catch (e) {
+            alert('Erreur de chargement de la configuration: ' + e.message);
+        }
+        try {
+            const counts = await loadCounts();
+            count1.textContent = counts['1'] || 0;
+            count2.textContent = counts['2'] || 0;
+        } catch (e) {
+            alert('Impossible de charger les votes: ' + e.message);
+            count1.textContent = 0;
+            count2.textContent = 0;
+        }
     }
 
     init();
