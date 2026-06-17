@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const voteButtons = document.querySelectorAll('.vote-btn');
     const count1 = document.getElementById('count1');
     const count2 = document.getElementById('count2');
-    const BACKEND_URL = 'https://yugioh-vote-backend.onrender.com'; // <-- change after deploying backend
+    const BACKEND_URL = 'https://yugioh-vote-backend.onrender.com';
 
     async function loadCounts() {
         try {
