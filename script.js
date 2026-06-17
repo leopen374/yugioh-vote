@@ -47,9 +47,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({id})
             });
-            if (!resp.ok) throw new Error('Vote failed');
             const data = await resp.json();
-            // update counts from backend
+            if (!resp.ok) {
+                // backend error (cooldown, max votes, etc.)
+                alert(data.error || 'Vote failed');
+                return;
+            }
+            // success
             count1.textContent = data['1'] || 0;
             count2.textContent = data['2'] || 0;
             // also update localStorage for fallback
@@ -57,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
             votes[id] = (votes[id] || 0) + 1;
             localStorage.setItem('yugiohVotes', JSON.stringify(votes));
         } catch (e) {
+            // network or unexpected error
             // fallback to localStorage only
             const votes = JSON.parse(localStorage.getItem('yugiohVotes')) || {1:0,2:0};
             votes[id] = (votes[id] || 0) + 1;
