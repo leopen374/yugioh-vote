@@ -2,12 +2,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const voteButtons = document.querySelectorAll('.vote-btn');
     const count1 = document.getElementById('count1');
     const count2 = document.getElementById('count2');
-    const titleEl = document.querySelector('h1');
+    const titleEl = document.getElementById('title');
     const char1El = document.querySelector('#card1 h2');
     const char2El = document.querySelector('#card2 h2');
     const img1El = document.querySelector('#card1 img');
     const img2El = document.querySelector('#card2 img');
     const resultDiv = document.getElementById('result');
+    const cardsEl = document.getElementById('cards');
     const BACKEND_URL = 'https://yugioh-vote-backend.onrender.com'; // <-- change after deploying backend
 
     async function loadConfig() {
@@ -68,12 +69,23 @@ document.addEventListener('DOMContentLoaded', () => {
             // if (img2El) img2El.src = config.image2;
             // Handle closed vote
             if (config.voting_closed) {
+                // Hide title and cards
+                titleEl.style.display = 'none';
+                cardsEl.style.display = 'none';
                 // Hide vote buttons
                 voteButtons.forEach(btn => btn.style.display = 'none');
                 // Show result
                 const winnerName = config.winner === 1 ? config.char1 : config.winner === 2 ? config.char2 : 'Inconnu';
                 resultDiv.textContent = `Le vainqueur est : ${winnerName}`;
                 resultDiv.style.display = 'block';
+            } else {
+                // Show title and cards
+                titleEl.style.display = '';
+                cardsEl.style.display = '';
+                // Show vote buttons
+                voteButtons.forEach(btn => btn.style.display = '');
+                // Hide result
+                resultDiv.style.display = 'none';
             }
         } catch (e) {
             alert('Erreur de chargement de la configuration: ' + e.message);
