@@ -61,8 +61,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (titleEl) titleEl.textContent = config.title;
             if (char1El) char1El.textContent = config.char1;
             if (char2El) char2El.textContent = config.char2;
-            if (img1El) img1El.src = config.image1;
-            if (img2El) img2El.src = config.image2;
+            // if (img1El) img1El.src = config.image1;
+            // if (img2El) img2El.src = config.image2;
         } catch (e) {
             alert('Erreur de chargement de la configuration: ' + e.message);
         }
