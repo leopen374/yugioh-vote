@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const titleEl = document.querySelector('h1');
     const char1El = document.querySelector('#card1 h2');
     const char2El = document.querySelector('#card2 h2');
+    const img1El = document.querySelector('#card1 img');
+    const img2El = document.querySelector('#card2 img');
     const BACKEND_URL = 'https://yugioh-vote-backend.onrender.com'; // <-- change after deploying backend
 
     async function loadConfig() {
@@ -18,7 +20,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return {
                 title: 'Quel personnage préférez-vous ?',
                 char1: 'Personnage 1',
-                char2: 'Personnage 2'
+                char2: 'Personnage 2',
+                image1: 'https://via.placeholder.com/150x200?text=Perso+1',
+                image2: 'https://via.placeholder.com/150x200?text=Perso+2'
             };
         }
     }
@@ -68,6 +72,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (titleEl) titleEl.textContent = config.title;
         if (char1El) char1El.textContent = config.char1;
         if (char2El) char2El.textContent = config.char2;
+        if (img1El) img1El.src = config.image1;
+        if (img2El) img2El.src = config.image2;
         const counts = await loadCounts();
         count1.textContent = counts['1'] || 0;
         count2.textContent = counts['2'] || 0;
