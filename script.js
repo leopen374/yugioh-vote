@@ -11,6 +11,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const cardsEl = document.getElementById('cards');
     const BACKEND_URL = 'https://yugioh-vote-backend.onrender.com'; // <-- change after deploying backend
 
+    // Modal elements
+    const modal = document.getElementById('errorModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalMessage = document.getElementById('modalMessage');
+    const modalOkBtn = document.getElementById('modalOkBtn');
+    const closeBtn = document.querySelector('.close');
+
+    function showModal(title, message) {
+        modalTitle.textContent = title;
+        modalMessage.textContent = message;
+        modal.style.display = 'block';
+    }
+
+    function hideModal() {
+        modal.style.display = 'none';
+    }
+
+    // Close modal when clicking on close button or OK button
+    closeBtn.addEventListener('click', hideModal);
+    modalOkBtn.addEventListener('click', hideModal);
+    // Close when clicking outside modal content
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            hideModal();
+        }
+    });
+
     async function loadConfig() {
         try {
             const resp = await fetch(`${BACKEND_URL}/config`);
@@ -47,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await resp.json();
             if (!resp.ok) {
                 // backend error (cooldown, max votes, etc.)
-                alert(data.error || 'Vote failed');
+                showModal('Erreur', data.error || 'Vote failed');
                 return;
             }
             // success
@@ -55,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
             count2.textContent = data['2'] || 0;
         } catch (e) {
             // network or unexpected error
-            alert('Backend indisponible: ' + e.message);
+            showModal('Backend indisponible', 'Backend indisponible: ' + e.message);
         }
     }
 
@@ -88,14 +115,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 resultDiv.style.display = 'none';
             }
         } catch (e) {
-            alert('Erreur de chargement de la configuration: ' + e.message);
+            showModal('Erreur de configuration', 'Erreur de chargement de la configuration: ' + e.message);
         }
         try {
             const counts = await loadCounts();
             count1.textContent = counts['1'] || 0;
             count2.textContent = counts['2'] || 0;
         } catch (e) {
-            alert('Impossible de charger les votes: ' + e.message);
+            showModal('Erreur de votes', 'Impossible de charger les votes: ' + e.message);
             count1.textContent = 0;
             count2.textContent = 0;
         }
